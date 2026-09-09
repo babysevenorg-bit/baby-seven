@@ -154,24 +154,48 @@ src/
 
 ---
 
-## 🌐 Deploying to Vercel
-
-1. Push this repo to GitHub.
-2. Import it in Vercel.
-3. Set the `DATABASE_URL` env var (Neon connection string).
-4. Update `prisma/schema.prisma`'s `datasource` to `provider = "postgresql"`.
-5. Run `bun run db:push` once against the Neon database (or use Vercel's build command).
-6. Deploy.
-
-A minimal `vercel.json` is included in the repo for the build command.
-
----
-
 ## 🔐 Security notes
 
 - This repo **never** contains API keys, tokens, or `DATABASE_URL` — they live in `.env` which is gitignored.
 - The admin PIN (`babyseven`) is for demo only. Replace the `PinGate` with **NextAuth.js** before going to production.
 - The Binance/PayPal/USDT addresses shown on the Support page are placeholders for the demo — replace `PAYMENT` in `src/components/baby-seven/support-view.tsx` with your real addresses.
+
+---
+
+## 🌐 Deploying to Cloudflare Pages
+
+This project is configured for **Cloudflare Pages** deployment via
+`@cloudflare/next-on-pages@1.13.15`. The full migration guide lives in
+[`MIGRATION.md`](./MIGRATION.md) — read it for the complete walkthrough.
+
+**Quick start:**
+
+1. Push the repo to GitHub (do NOT use any token you've previously leaked in chat).
+2. Cloudflare Dashboard → Workers & Pages → Create application → Pages →
+   Connect to Git → pick the repo.
+3. Build settings:
+   - **Build command:** `bun run pages:build`
+   - **Build output directory:** `.vercel/output/static`
+   - **Root directory:** `/`
+4. Add `NODE_VERSION = 20` + `DATABASE_URL` env vars in the dashboard.
+5. Save and Deploy.
+
+**How the build works:** The `pages:build` script runs
+`scripts/pages-build.ts`, which uses a build-time transform
+(`scripts/toggle-edge-runtime.ts`) to inject `export const runtime = "edge";`
+into every API route file before `@cloudflare/next-on-pages` runs, then
+reverts the files in a `finally` block. This means:
+
+- Local `bun run dev` keeps using the Node runtime + Prisma + SQLite (no
+  regressions, no `PrismaClientValidationError`).
+- Cloudflare's build gets the edge-runtime export it needs, produces a
+  successful Cloudflare Pages output, then reverts the working tree.
+
+Production database: **Cloudflare D1** (SQLite-compatible). The Prisma
+client in `src/lib/db.ts` auto-detects the `env.DB` binding on Cloudflare
+and uses `@prisma/adapter-d1` to run in the edge runtime. D1 migrations
+live in `prisma/migrations-d1/`. Apply with
+`npx wrangler d1 migrations apply baby-seven-db --remote`.
 
 ---
 

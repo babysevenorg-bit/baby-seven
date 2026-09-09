@@ -223,3 +223,37 @@ Stage Summary:
 - The Drizzle + Neon swap was also NOT done because it's a real rewrite (6 API routes, dozens of queries, schema conversion, re-seeding). The MIGRATION.md documents the exact steps + offers it as an alternative path.
 - The user can run `bun run pages:build` today and it will execute `next build` cleanly, then print the expected "add `runtime = 'edge'` to these routes" message — exactly the Phase 2 starting point.
 - All existing functionality preserved: Maintenance Mode, Notify Me, Admin Studio, theme toggle, Google Search Bar, Reel Editor hub, Portfolio filters — every feature continues to work in dev as before.
+
+---
+Task ID: 60-68
+Agent: orchestrator (Cloudflare Phase 2 — build-time transform + push readiness)
+Task: Resolve the "Failed: error occurred while fetching repository" error + complete Phase 2 so the user can actually deploy to Cloudflare Pages with zero local dev regressions.
+
+Work Log:
+- Diagnosed the immediate error: ran `git ls-remote https://github.com/babysevenorg-bit/baby-seven.git` → empty output → the GitHub repo exists but has ZERO commits pushed. Cloudflare can't clone an empty repo. (I had refused to push earlier because the user pasted a PAT in chat — that PAT must be treated as compromised.)
+- Identified the deeper blocker: even if the user pushes, the Cloudflare build would fail with "routes were not configured to run with the Edge Runtime" because Phase 2 (adding `runtime = 'edge'` to all API routes) wasn't done.
+- First attempt: tried `export const runtime = process.env.EDGE_RUNTIME === "1" ? "edge" : "nodejs"` on /api/stats. Next.js rejected it: "Next.js can't recognize the exported `runtime` field in route. It needs to be a static string." Route segment config must be statically analyzable — conditional exports don't work.
+- Designed a better approach: a build-time file transform. Created `scripts/toggle-edge-runtime.ts` that scans every `route.ts` under `src/app/api/` and either prepends `export const runtime = "edge";` (mode `on`) or removes that exact line (mode `off`).
+- Created `scripts/pages-build.ts` as the `pages:build` wrapper: it runs toggle-on, spawns `@cloudflare/next-on-pages`, then in a `finally` block ALWAYS runs toggle-off — so the API routes are reverted even if the build throws. This means local `bun run dev` is never left broken.
+- Updated `package.json`: `pages:build`, `preview`, and `deploy` all call `bun run scripts/pages-build.ts` (with appropriate args forwarded).
+- Verified the full pipeline:
+  - `bun run scripts/toggle-edge-runtime.ts on` → injects the export into all 10 API routes (confirmed with `head -5` on /api/stats and /api/editors).
+  - `bun run pages:build` → next-on-pages produced a successful Cloudflare Pages build output: "⚡️ Build completed in 2.57s". The wrapper then ran toggle-off and reverted all 10 routes.
+  - After the build: `curl http://localhost:3000/api/stats` → 200 OK with full JSON (local dev unaffected).
+  - `grep -l "runtime = \"edge\"" src/app/api/**/route.ts` → no matches (all routes clean).
+- Generated D1-compatible SQL migrations from the Prisma schema:
+  - `prisma/migrations-d1/0001_init.sql` via `bunx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script` — all 6 tables + the unique index on NotifySubscriber.email.
+  - `prisma/migrations-d1/0002_seed.sql` — hand-written D1-compatible seed data matching `scripts/seed.ts` (8 projects, 4 testimonials, 5 reel editors, 4 page views). Uses `LOWER(HEX(RANDOMBLOB(25)))` for cuid-style ids.
+- Created `public/_routes.json` to tell Cloudflare Pages to only invoke the Worker for `/api/*` requests — everything else served as static assets (saves Worker invocations = saves money + latency).
+- Rewrote MIGRATION.md to reflect the new build-time transform approach (no longer requires the user to manually add `runtime = 'edge'` to every route or switch to `wrangler pages dev` for local dev). New 5-step deploy guide.
+- Updated README: removed the old Vercel section, added a Cloudflare Pages section explaining the build-time transform + D1 setup, kept `vercel.json` as a backup option (the two deploy paths don't conflict).
+- Lint: 0 errors / 0 warnings. Dev server: clean, all APIs return 200.
+- Verified with Agent Browser: home page renders, live counter shows "Join 58+ creators" (50 baseline + 6 editors + 2 launch subscribers), no errors.
+
+Stage Summary:
+- The "Failed: error occurred while fetching repository" error is because the GitHub repo has zero commits. The user must push from their own machine using a FRESH credential (never the previously leaked PAT).
+- The deeper Phase 2 problem (Cloudflare build would fail on edge runtime) is now SOLVED via the build-time transform: `bun run pages:build` injects `runtime = 'edge'` into all 10 API routes, runs `@cloudflare/next-on-pages` (which now produces a successful Cloudflare build), and reverts the routes in a `finally` block. Local `next dev` is never affected.
+- `bun run pages:build` was verified to succeed locally — output ends with "⚡️ Build completed in 2.57s" and "[off] edge-runtime export removed from 10 route files."
+- D1 migrations + seed SQL are committed and ready to apply via `wrangler d1 migrations apply baby-seven-db --remote`.
+- The user's path to a successful deploy is now: (1) push to GitHub with a fresh credential, (2) connect repo to Cloudflare Pages, (3) build command = `bun run pages:build`, (4) build output = `.vercel/output/static`, (5) add NODE_VERSION=20 + DATABASE_URL env vars, (6) create the D1 database + apply migrations, (7) deploy.
+- All existing functionality preserved: Maintenance Mode, Notify Me, Admin Studio, theme toggle, Google Search Bar, Reel Editor hub, Portfolio filters — every feature works as before in local dev.
