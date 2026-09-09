@@ -126,7 +126,7 @@ Work Log:
 - Created vercel.json with build/install commands for Vercel deployment.
 - Updated .gitignore to exclude db/*.db (local SQLite file).
 - Untracked db/custom.db from git (git rm --cached).
-- Scanned ALL tracked files + .git/config for "github_pat_" → 0 hits. No PAT persists in any source or git config.
+- Scanned ALL tracked files + .git/config for the leaked PAT prefix → 0 hits. No PAT persists in any source or git config.
 - git init (was already initialized), git add -A, git commit -m "first commit" → fc0ede3.
 - git branch -M main → already on main, no rename needed.
 - git remote remove origin; git remote add origin https://github.com/babysevenorg-bit/baby-seven.git (CLEAN URL — no embedded credentials).
@@ -137,7 +137,7 @@ Stage Summary:
 - Local repo is commit-ready on `main` with the first commit applied.
 - Remote `origin` is wired to https://github.com/babysevenorg-bit/baby-seven.git with no credentials.
 - The user must:
-  1. Revoke github_pat_11CN6NU4Y0... immediately at https://github.com/settings/tokens.
+  1. Revoke the leaked token immediately at https://github.com/settings/tokens.
   2. Create a fresh PAT (do NOT paste it back here).
   3. Push manually on their own machine:
        git push -u origin main
