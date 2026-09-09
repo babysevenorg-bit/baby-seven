@@ -183,3 +183,43 @@ Stage Summary:
 - "Notify Me" form is production-ready: persists to Neon/SQLite, dedupes via the unique constraint, surfaces a confirmation state, and the subscriber count is visible to the admin.
 - The "magic switch" (const IS_LIVE = false) is at the top of src/components/baby-seven/support-view.tsx, well-commented, and the admin panel shows its current value with a path hint.
 - All existing live-state functionality (Binance Copy, PayPal link, MiniPay QR, USDT Copy) is preserved and unchanged — it just stays dormant until the user flips the switch.
+
+---
+Task ID: 50-58
+Agent: orchestrator (Cloudflare Pages migration)
+Task: Migrate the Baby Seven app from Vercel to Cloudflare Pages per the user's spec, with honest pushback where the spec breaks the actual stack.
+
+Work Log:
+- Read the spec. Identified the gap: prompt assumes Next.js 14 + Drizzle + Neon Postgres + multi-route pages; actual project is Next.js 16.1.3 + Prisma + SQLite + single-route SPA. Decided to do the safe scaffolding now + document Phase 2 + offer Drizzle/Neon as a documented alternative.
+- Tried `bun add -d @cloudflare/next-on-pages@1.13.15` — installed cleanly. Ran it: the package DOES build Next.js 16 (the user's version pin was correct). Build completes `next build` in 18s, then explicitly demands `export const runtime = 'edge'` on every API route before producing Cloudflare output.
+- Empirically confirmed the Prisma+edge incompatibility: added `runtime = 'edge'` to /api/stats → every request returned 500 with `PrismaClientValidationError: In order to run Prisma Client on edge runtime, either: Use Prisma Accelerate, or Use Driver Adapters`. Reverted the change.
+- Installed `@prisma/adapter-d1` (edge-compatible Prisma driver for Cloudflare D1).
+- Rewrote `src/lib/db.ts` as a dual-mode client: detects whether the Cloudflare D1 binding (`env.DB`) is present; if yes, instantiates PrismaClient with `@prisma/adapter-d1` (edge-compatible); if no, falls back to standard PrismaClient + SQLite (local Node dev). Singleton cache preserved.
+- Created `wrangler.toml` in project root with the exact name + compatibility_date + vars from the spec, plus a `[[d1_databases]]` binding block for `DB` (the binding the Prisma D1 adapter reads from).
+- Updated `package.json` scripts: added `pages:build`, `preview`, `deploy` exactly per spec, plus `d1:create`, `d1:migrate:local`, `d1:migrate:remote`, `wrangler:secret` helpers.
+- Updated `next.config.ts` (the project uses .ts not .mjs): kept `output: "standalone"`, replaced the deprecated `images.domains` with Next 16's `images.remotePatterns` (Unsplash + the z.ai CDN), removed the `experimental.runtime = 'edge'` line because Next 16 deprecated that config flag (the per-route `export const runtime = 'edge'` is the correct mechanism, documented in MIGRATION.md).
+- Created `public/_headers` with `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, plus a `Permissions-Policy` lock-down.
+- Created `public/_redirects` with `/* /index.html 200` for the SPA fallback.
+- Wrote a comprehensive `MIGRATION.md` that:
+  - Documents the actual stack vs the spec assumptions (honest gap table).
+  - Lists exactly what this commit ships (the safe scaffolding).
+  - Explicitly documents what was NOT done and why (`runtime = 'edge'` would break Prisma in dev; Drizzle+Neon is a real rewrite, not a config tweak).
+  - Provides a complete 8-step Phase 2 path to actually deploy: install Wrangler CLI, create D1 database, generate D1 migration from Prisma schema, add `runtime = 'edge'` to every API route, switch local dev to `wrangler pages dev`, set DATABASE_URL secret, apply migration to remote D1, deploy.
+  - Documents the git-based deployment path (Cloudflare dashboard → Connect to Git).
+  - Provides the Drizzle + Neon alternative for users who want to follow the prompt's literal DB stack.
+  - Includes a troubleshooting table and a migration checklist.
+- Added `.vercel/`, `.wrangler/`, `prisma/migrations-d1/` to `.gitignore` so the next-on-pages build artifacts aren't committed.
+- Cleaned up the generated `.vercel/` directory and re-ran lint — 0 errors / 0 warnings.
+- Verified end-to-end with Agent Browser:
+  - Home page renders with "Baby Seven — Architect of Worlds" hero, live counter shows "Join 57+ creators".
+  - Support view: Maintenance Mode page renders with the email capture form.
+  - Filled "deploy-test@cinematic.studio" + clicked NOTIFY ME → toast "Subscribed 🚀" → /api/notify count went 1 → 2. DB persistence confirmed working.
+  - All API routes return 200 with valid JSON.
+- Final lint: 0 errors / 0 warnings. Dev server clean.
+
+Stage Summary:
+- The Cloudflare Pages migration scaffolding is fully in place: `wrangler.toml`, `package.json` scripts, dual-mode `src/lib/db.ts`, security headers, SPA redirects, comprehensive `MIGRATION.md`.
+- The literal instruction "add `export const runtime = 'edge'` to every API route" was NOT applied because it would break every Prisma-backed API route in dev (empirically verified: `PrismaClientValidationError`). The MIGRATION.md documents this with the exact error and the Phase 2 steps required to safely add it (which include switching local dev to `wrangler pages dev` and provisioning a real D1 binding).
+- The Drizzle + Neon swap was also NOT done because it's a real rewrite (6 API routes, dozens of queries, schema conversion, re-seeding). The MIGRATION.md documents the exact steps + offers it as an alternative path.
+- The user can run `bun run pages:build` today and it will execute `next build` cleanly, then print the expected "add `runtime = 'edge'` to these routes" message — exactly the Phase 2 starting point.
+- All existing functionality preserved: Maintenance Mode, Notify Me, Admin Studio, theme toggle, Google Search Bar, Reel Editor hub, Portfolio filters — every feature continues to work in dev as before.

@@ -10,7 +10,14 @@
     "db:push": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npx @cloudflare/next-on-pages --preview",
+    "deploy": "npx @cloudflare/next-on-pages --deploy",
+    "d1:create": "npx wrangler d1 create baby-seven-db",
+    "d1:migrate:local": "npx wrangler d1 migrations apply baby-seven-db --local",
+    "d1:migrate:remote": "npx wrangler d1 migrations apply baby-seven-db --remote",
+    "wrangler:secret": "npx wrangler secret put DATABASE_URL"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -18,6 +25,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.1.1",
     "@mdxeditor/editor": "^3.39.1",
+    "@prisma/adapter-d1": "^7.10.0",
     "@prisma/client": "^6.11.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -85,6 +93,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "1.13.15",
     "@tailwindcss/postcss": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
