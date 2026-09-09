@@ -6,6 +6,16 @@
 name = "baby-seven-portfolio"
 compatibility_date = "2026-01-31"
 
+# Required for `npx wrangler pages deploy` to recognize this as a Cloudflare
+# Pages project and know where the built assets live. The `bun run pages:build`
+# script (which runs `@cloudflare/next-on-pages`) produces this directory.
+#
+# Note: do NOT add an `[assets]` block — that makes wrangler treat this as a
+# Cloudflare Workers project (not Pages) and triggers a security warning about
+# uploading _worker.js as a public asset. For Pages, `pages_build_output_dir`
+# is the correct directive.
+pages_build_output_dir = ".vercel/output/static"
+
 [vars]
 ENVIRONMENT = "production"
 NEXT_PUBLIC_SITE_URL = "https://baby-seven.pages.dev"
