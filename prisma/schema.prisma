@@ -1,0 +1,50 @@
+// Prisma schema for Baby Seven cinematic personal brand app.
+// Uses SQLite (per environment constraint). Adapts the original Neon/Drizzle spec.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Incoming collaboration requests submitted via the Collaboration Portal.
+model Collaboration {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  tier      String   // 'Apprentice' | 'Partner' | 'Exec'
+  budget    Int      // integer budget in USD
+  message   String
+  status    String   @default("Pending") // 'Pending' | 'Reviewed' | 'Hired'
+  createdAt DateTime @default(now())
+}
+
+/// Portfolio projects (writing, video, scripts).
+model Project {
+  id          String  @id @default(cuid())
+  title       String
+  category    String  // 'Writing' | 'Video' | 'Script'
+  description String
+  coverImage  String  // URL or path
+  videoUrl    String? // optional video embed/link
+  isFeatured  Boolean @default(false)
+  rank        Int?    // optional search-rank highlight (e.g. 1 for Blood Disaster)
+}
+
+/// Client testimonials.
+model Testimonial {
+  id        String @id @default(cuid())
+  clientName String
+  text      String
+  rating    Int    // 1..5
+}
+
+/// Per-route popularity counter.
+model PageView {
+  id    String @id @default(cuid())
+  route String
+  count Int    @default(0)
+}
