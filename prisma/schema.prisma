@@ -61,3 +61,12 @@ model PageView {
   route String
   count Int    @default(0)
 }
+
+/// "Notify Me" subscribers who want a launch alert when the Support Hub
+/// goes live (collected while the Support page is in Maintenance Mode).
+model NotifySubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  notified  Boolean  @default(false) // set true once the launch email is sent
+}

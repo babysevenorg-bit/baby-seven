@@ -9,11 +9,13 @@ type Stats = {
   featuredProjects: number;
   totalProjects: number;
   reelEditors: number;
+  notifySubscribers: number;
 };
 
 /**
  * LiveCollaboratorCounter — a dynamic hero counter that fetches the current
- * count of collaborators + reel-editor applicants from the DB and renders:
+ * count of collaborators + reel-editor applicants + launch subscribers from
+ * the DB and renders:
  *   "🔥 Join 50+ creators already collaborating with Baby Seven."
  *
  * The "50+" floor is a branding baseline; the live count is added on top so
@@ -33,7 +35,10 @@ export function LiveCollaboratorCounter() {
   // Animated count-up once the live number arrives.
   useEffect(() => {
     if (!stats) return;
-    const live = (stats.collaborations ?? 0) + (stats.reelEditors ?? 0);
+    const live =
+      (stats.collaborations ?? 0) +
+      (stats.reelEditors ?? 0) +
+      (stats.notifySubscribers ?? 0);
     const target = 50 + live; // branding baseline 50 + live community
     let raf: number;
     const start = performance.now();

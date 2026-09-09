@@ -12,6 +12,7 @@ import { db } from "@/lib/db";
  *     totalProjects: number,
  *     testimonials: number,
  *     reelEditors: number,         // reel-editor applicants
+ *     notifySubscribers: number,   // "Notify Me" launch alert subscribers
  *     pageViews: Record<route, count>
  *   }
  */
@@ -23,6 +24,7 @@ export async function GET() {
       totalProjects,
       testimonials,
       reelEditors,
+      notifySubscribers,
       pageViews,
     ] = await Promise.all([
       db.collaboration.count(),
@@ -30,6 +32,7 @@ export async function GET() {
       db.project.count(),
       db.testimonial.count(),
       db.reelEditor.count(),
+      db.notifySubscriber.count(),
       db.pageView.findMany(),
     ]);
 
@@ -44,6 +47,7 @@ export async function GET() {
       totalProjects,
       testimonials,
       reelEditors,
+      notifySubscribers,
       pageViews: viewsByRoute,
     });
   } catch (e) {

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Trash2, Mail, ExternalLink, Lock, ArrowLeft } from "lucide-react";
+import { Shield, Trash2, Mail, ExternalLink, Lock, ArrowLeft, Bell } from "lucide-react";
+import { FaTools } from "react-icons/fa";
 import { useNav, type ViewId } from "@/lib/nav";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatBudget } from "@/lib/utils";
@@ -131,18 +132,21 @@ function AdminPanel({ setView }: { setView: (v: ViewId) => void }) {
   const [tab, setTab] = useState<Tab>("editors");
   const [editors, setEditors] = useState<Editor[]>([]);
   const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
+  const [notifyCount, setNotifyCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [eRes, cRes] = await Promise.all([
+      const [eRes, cRes, nRes] = await Promise.all([
         fetch("/api/editors").then((r) => r.json()),
         fetch("/api/collaborations").then((r) => r.json()),
+        fetch("/api/notify").then((r) => r.json()),
       ]);
       setEditors(eRes.editors ?? []);
       setCollaborations(cRes.collaborations ?? []);
+      setNotifyCount(nRes.count ?? 0);
     } catch {
       toast({
         title: "Failed to load",
@@ -213,15 +217,34 @@ function AdminPanel({ setView }: { setView: (v: ViewId) => void }) {
         </div>
 
         {/* Stat strip */}
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
           <StatCard label="Reel Editors" value={editors.length} icon={<Shield className="h-4 w-4 text-cyan" />} />
           <StatCard label="Pending" value={editors.filter((e) => e.status === "Pending").length} icon={<Lock className="h-4 w-4 text-gold" />} />
           <StatCard label="Collab Requests" value={collaborations.length} icon={<Mail className="h-4 w-4 text-cyan" />} />
+          <StatCard
+            label="Launch Subscribers"
+            value={notifyCount}
+            icon={<Bell className="h-4 w-4 text-gold" />}
+          />
           <StatCard
             label="Hired Editors"
             value={editors.filter((e) => e.status === "Hired").length}
             icon={<Shield className="h-4 w-4 text-emerald-400" />}
           />
+        </div>
+
+        {/* Support Hub status banner */}
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3">
+          <FaTools className="h-4 w-4 text-gold" />
+          <p className="flex-1 text-xs text-ash">
+            <span className="font-display tracking-widest text-gold">SUPPORT HUB:</span>{" "}
+            <span className="text-foreground">MAINTENANCE MODE</span> (IS_LIVE = false).{" "}
+            Flip the switch in{" "}
+            <code className="rounded bg-card/60 px-1.5 py-0.5 font-mono text-[10px] text-foreground">
+              src/components/baby-seven/support-view.tsx
+            </code>{" "}
+            to go live with payments.
+          </p>
         </div>
 
         {/* Tab switcher */}

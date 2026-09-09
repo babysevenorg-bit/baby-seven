@@ -35,8 +35,16 @@ A Next.js 16 single-page experience with a dark/light theme system, an SEO-drive
 
 ### Support
 - 2-second loading screen (`useEffect` + `setTimeout(2000)`) with a spinning film reel and bouncing dots.
-- Glass-morphism 2×2 grid of peer-to-peer payment tiles: Binance (Copy ID), PayPal (Pay Now link), MiniPay/Celo (live QR code via `next/dynamic` ssr:false), USDT BEP-20 (Copy Address).
+- **🔥 Maintenance Mode (`IS_LIVE = false` by default).** When the page is in maintenance mode, the Support page shows a cinematic "Support Hub Upgrade" holding page with:
+  - Branded copy: "🚀 Baby Seven is currently upgrading the Support Hub to serve you better… integrating Binance Pay, PayPal, and MiniPay to make supporting the #1 'Blood Disaster' creator as smooth as possible."
+  - An "Estimated Launch: Coming Soon" badge.
+  - A **"Notify Me"** email capture form — subscribes visitors to the launch alert list (persisted in the `NotifySubscriber` table; idempotent via a `unique` email constraint).
+  - Action buttons: "Browse My Work" (→ Portfolio), "Collaborate Instead" (→ Collaboration Portal).
+- **Magic Switch.** A single `const IS_LIVE = false;` at the top of `src/components/baby-seven/support-view.tsx`. When you flip it to `true`, the page instantly renders the full Smart Payment Card dashboard (no other code changes needed).
+- Smart Payment Card (live, when `IS_LIVE = true`): glass-morphism 2×2 grid of peer-to-peer payment tiles — Binance (Copy ID), PayPal (Pay Now link), MiniPay/Celo (live QR code via `next/dynamic` ssr:false), USDT BEP-20 (Copy Address).
 - Security footer with the exact lock/security messages from the spec.
+
+> 💡 The hidden Admin Studio (footer "Studio Access" link, PIN `babyseven`) shows the live subscriber count and a "SUPPORT HUB: MAINTENANCE MODE" banner so you can see the switch state at a glance.
 
 ### Hidden admin studio
 - Access via the discreet "Studio Access" link in the footer or the URL hash `#admin`.
@@ -102,7 +110,7 @@ DATABASE_URL="file:/home/z/my-project/db/custom.db"
 
 ```
 prisma/
-  schema.prisma                  # Collaboration, ReelEditor, Project, Testimonial, PageView
+  schema.prisma                  # Collaboration, ReelEditor, Project, Testimonial, PageView, NotifySubscriber
 scripts/
   seed.ts                        # Cinematic starter content
   reset-db.ts                    # Wipe all tables (for idempotent re-seeds)
@@ -111,6 +119,7 @@ src/
     api/
       collaborations/             # GET list, [id] DELETE
       editors/                    # GET list, POST apply, [id] PATCH status + DELETE
+      notify/                     # GET count, POST subscribe (idempotent)
       projects/                   # GET (filter by category, featured, pin #1 first)
       stats/                      # Aggregate counts for the homepage
       testimonials/               # GET all
@@ -138,7 +147,9 @@ src/
 | `POST` | `/api/editors` | Submit a reel-editor application |
 | `PATCH` | `/api/editors/[id]` | (admin) update editor status (`Pending`/`Shortlisted`/`Hired`) |
 | `DELETE` | `/api/editors/[id]` | (admin) remove an editor |
-| `GET` | `/api/stats` | Aggregate counts: collaborations, reelEditors, projects, featured, testimonials, pageViews |
+| `GET` | `/api/notify` | (admin) get launch-alert subscriber count |
+| `POST` | `/api/notify` | Subscribe an email to the Support Hub launch alert (idempotent) |
+| `GET` | `/api/stats` | Aggregate counts: collaborations, reelEditors, notifySubscribers, projects, featured, testimonials, pageViews |
 | `GET` | `/api/testimonials` | List all testimonials |
 
 ---
