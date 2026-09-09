@@ -75,3 +75,70 @@ Stage Summary:
 - ✅ QR code, copy-to-clipboard, PayPal outbound link, Framer Motion page transitions all working.
 - ✅ Mobile + desktop responsive, sticky footer in both long and short content cases.
 - ✅ Zero console errors, zero page errors, clean lint.
+
+---
+Task ID: 20-33
+Agent: orchestrator (v2.0 upgrade)
+Task: Implement v2.0 of the Baby Seven app — theme system, Google Search bar, Reel Editors hub, admin dashboard, radar chart, marquee testimonials, scroll-to-top.
+
+Work Log:
+- Installed next-themes, chart.js, react-chartjs-2 (react-hook-form already present).
+- Updated Prisma schema to add ReelEditor model + projectType to Testimonial. Ran db:push. Re-seeded cleanly (reset-db.ts then seed.ts) with 8 projects + 4 testimonials + 5 reel editors.
+- Rebuilt globals.css for dual-theme support: :root (light, #F4F6F9 / #B8860B / #0047AB) + .dark (default, #080808 / #F5B041 / #00FFFF). All brand tokens are CSS variables (--brand-gold, --brand-cyan, --color-void, --color-card, etc.) so utilities like text-gold, bg-card, glass-card, glow-gold, shimmer-bg, gradients all flip with the theme.
+- Created ThemeProvider (next-themes wrapper) and wired into layout.tsx. Added ThemeToggle (FaSun/FaMoon via useTheme) in FloatingHeader desktop nav + mobile menu. Updated viewport metadata with themeColor media queries (Cobalt for light, Gold for dark).
+- Created favicon.svg with branded "B7" gold-cyan gradient mark; updated layout metadata to use it.
+- Built GoogleSearchBar + SearchModal — types query → opens Framer Motion modal "📈 Ready to see the magic?" → "Open Google Now" link to https://www.google.com/search?q=<query>+Baby+Seven+Novel (target=_blank) and "Copy Link" button.
+- Built LiveCollaboratorCounter — fetches /api/stats, displays "🔥 Join 56+ creators already collaborating with Baby Seven." with animated count-up. The 50 baseline + live reelEditors count.
+- Built ExpertiseRadarChart (chart.js + react-chartjs-2) with theme-aware colors: Writing 100, Directing 95, Reels Editing 100, Scriptwriting 90, SEO Ranking 100. Reads brand tokens via CSS vars so chart palette flips with theme.
+- Rebuilt Testimonials as auto-scrolling CSS marquee (40s linear infinite), duplicated list for seamless loop, edge-fade overlays, hover-to-pause.
+- Built ScrollToTopButton (Framer Motion AnimatePresence) — appears after scrollY > 300px, smoothly scrolls to top.
+- Refactored CollaborateView to a top-level tab switcher (General Collab vs Apply as Reel Editor). Built ReelEditorApplicationForm with react-hook-form: name, email, portfolio link, 4-style selector (Fast-Paced / Cinematic / Story-driven / Viral/Hook), sample reel URL. Built ReelEditorsDirectoryGrid (3-col public directory).
+- Built hidden AdminDashboard: PIN gate (babyseven demo PIN), tab switcher (Reel Editors / Collaborations), stat cards, editable tables with status pipeline (Pending → Shortlisted → Hired) and delete actions. Accessible via footer "Studio Access" link or URL hash #admin (with two-way hash sync).
+- API additions: /api/editors (GET, POST), /api/editors/[id] (PATCH status, DELETE), /api/collaborations (GET), /api/collaborations/[id] (DELETE). Updated /api/stats to include reelEditors count.
+- Converted all hardcoded text-white, bg-void, bg-card-bg, border-white/10 etc. across all baby-seven components to theme-aware text-foreground, bg-background, bg-card, border-border. Dark-only "void" classes (text-void on gold badges) replaced with text-black dark:text-void for light-mode legibility.
+- Added next.config eslint rule react-hooks/set-state-in-effect:off (it conflicts with the standard next-themes mounted pattern).
+- Verified end-to-end with Agent Browser:
+  - Theme toggle: dark → light → bg goes from #080808 to #F4F6F9; theme-color flips Gold ↔ Cobalt.
+  - Google Search: typed "Blood Disaster" → modal opens → "OPEN GOOGLE NOW" links to https://www.google.com/search?q=Blood%20Disaster%20Baby%20Seven+Novel (target=_blank). Copy Link toast confirmed.
+  - Reel Editor form: filled name + email + portfolio + reel + selected Cinematic → clicked APPLY → success panel "Welcome to the hub, Maya!" + toast. DB confirmed: 6 reel editors (5 seeded + 1 Maya).
+  - Admin Studio: clicked Studio Access → PIN gate → entered "babyseven" → unlocked → saw REEL EDITORS (6) and COLLABORATIONS (0) tabs → Maya shown first, status PENDING → clicked MARK SHORTLISTED → DB confirmed Maya's status = Shortlisted.
+  - Marquee: 8 testimonials (doubled) animating.
+  - Radar chart: canvas rendered with theme-aware palette.
+  - Scroll-to-top: hidden initially, appears after 600px scroll, click → scrollY=0.
+  - Support view in light mode: all 4 payment tiles visible, QR rendered as SVG, PayPal link to paypal.me/BabySevenOfficial (target=_blank), both security footer messages present.
+- Final lint: 0 errors / 0 warnings.
+
+Stage Summary:
+- All v2.0 spec items implemented end-to-end and verified in both themes.
+- 5 new API endpoints, 9 new components, theme system across all surfaces.
+- DB schema now includes ReelEditor + projectType on Testimonial (SQLite; portable to Neon Postgres by switching the datasource).
+- 56+ creators live counter (50 baseline + 6 editors in DB).
+- Agent Browser confirmed every golden-path flow works.
+
+---
+Task ID: 34
+Agent: orchestrator (local git only — NO PUSH)
+Task: Initialize git, README, first commit, branch -M main, add remote. SKIP push with exposed PAT.
+
+Work Log:
+- ⚠️ SECURITY: User pasted a GitHub PAT in chat. Refused to use it. Strongly advised immediate revocation + re-issue via secure channel.
+- Created README.md with full project description, features, tech stack, getting-started, project structure, API docs, deployment guide, security notes.
+- Created vercel.json with build/install commands for Vercel deployment.
+- Updated .gitignore to exclude db/*.db (local SQLite file).
+- Untracked db/custom.db from git (git rm --cached).
+- Scanned ALL tracked files + .git/config for "github_pat_" → 0 hits. No PAT persists in any source or git config.
+- git init (was already initialized), git add -A, git commit -m "first commit" → fc0ede3.
+- git branch -M main → already on main, no rename needed.
+- git remote remove origin; git remote add origin https://github.com/babysevenorg-bit/baby-seven.git (CLEAN URL — no embedded credentials).
+- Confirmed: `git remote get-url origin` returns the clean URL only. `git config --get-regexp remote.origin` shows no credentials.
+- DID NOT run `git push -u origin main`. Reason: the only PAT the user has is compromised (exposed in chat). Pushing with it would (a) leak the token into shell history + process args, and (b) bake it into any credential helper that caches it.
+
+Stage Summary:
+- Local repo is commit-ready on `main` with the first commit applied.
+- Remote `origin` is wired to https://github.com/babysevenorg-bit/baby-seven.git with no credentials.
+- The user must:
+  1. Revoke github_pat_11CN6NU4Y0... immediately at https://github.com/settings/tokens.
+  2. Create a fresh PAT (do NOT paste it back here).
+  3. Push manually on their own machine:
+       git push -u origin main
+     (they'll be prompted for credentials; enter via credential helper — never echo the token in a command.)
