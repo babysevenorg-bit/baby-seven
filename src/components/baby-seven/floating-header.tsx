@@ -5,6 +5,7 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useNav, NAV_ITEMS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * FloatingHeader — transparent top bar that gains a blurred glass background
@@ -53,7 +54,7 @@ export function FloatingHeader() {
             className="group flex items-center gap-2"
             aria-label="Baby Seven home"
           >
-            <span className="font-display text-lg font-extrabold tracking-widest text-white sm:text-xl">
+            <span className="font-display text-lg font-extrabold tracking-widest text-foreground sm:text-xl">
               BABY <span className="text-gradient-gold">SEVEN</span>
             </span>
             <span className="hidden h-1.5 w-1.5 rounded-full bg-cyan animate-pulse-dot sm:inline-block" />
@@ -68,12 +69,13 @@ export function FloatingHeader() {
                 data-active={view === item.id}
                 className={cn(
                   "nav-underline font-display text-sm font-medium tracking-wider transition-colors",
-                  view === item.id ? "text-cyan" : "text-ash hover:text-white",
+                  view === item.id ? "text-cyan" : "text-ash hover:text-foreground",
                 )}
               >
                 {item.label.toUpperCase()}
               </button>
             ))}
+            <ThemeToggle />
             <button
               onClick={() => handleNav("support")}
               className="group relative overflow-hidden rounded-full border border-gold/60 px-5 py-2 font-display text-xs font-bold tracking-widest text-gold transition-all hover:glow-gold"
@@ -83,14 +85,17 @@ export function FloatingHeader() {
             </button>
           </nav>
 
-          {/* Mobile burger */}
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="rounded-lg border border-white/10 bg-white/5 p-2 text-white md:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          {/* Mobile burger + theme toggle */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="rounded-lg border border-white/10 bg-white/5 p-2 text-foreground md:hidden"
+              aria-label={open ? "Close menu" : "Open menu"}
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </motion.header>
 
@@ -110,7 +115,7 @@ export function FloatingHeader() {
                 "rounded-lg px-4 py-3 text-left font-display text-sm tracking-wider transition-colors",
                 view === item.id
                   ? "bg-cyan/10 text-cyan"
-                  : "text-ash hover:bg-white/5 hover:text-white",
+                  : "text-ash hover:bg-foreground/5 hover:text-foreground",
               )}
             >
               {item.label.toUpperCase()}

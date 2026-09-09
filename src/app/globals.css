@@ -39,14 +39,14 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Baby Seven brand tokens */
-  --color-void: #080808;
-  --color-card-bg: #121212;
-  --color-gold: #f5b041;
-  --color-cyan: #00ffff;
-  --color-ink: #ffffff;
-  --color-ash: #a3a3a3;
-  --color-stone: #737373;
+  /* Baby Seven brand tokens (semantic — change between themes) */
+  --color-void: var(--background);
+  --color-card-bg: var(--card);
+  --color-gold: var(--brand-gold);
+  --color-cyan: var(--brand-cyan);
+  --color-ink: var(--foreground);
+  --color-ash: var(--muted-foreground);
+  --color-stone: var(--muted-foreground);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -54,9 +54,56 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ---------------------------------------------------------------- *
+ * LIGHT MODE (default)
+ * Background: #F4F6F9 · Cards: #FFFFFF · Text: #1A1A1A
+ * Accents: Deep Gold #B8860B and Cobalt Blue #0047AB
+ * ---------------------------------------------------------------- */
 :root {
   --radius: 1rem;
-  /* Cinematic dark theme — always on */
+  --background: #f4f6f9;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #b8860b;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f6;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0f2f7;
+  --muted-foreground: #5c6068;
+  --accent: #0047ab;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.06);
+  --ring: #0047ab;
+  --chart-1: #b8860b;
+  --chart-2: #0047ab;
+  --chart-3: #a855f7;
+  --chart-4: #ec4899;
+  --chart-5: #84cc16;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #b8860b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f2f7;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: #0047ab;
+
+  /* Brand */
+  --brand-gold: #b8860b;
+  --brand-cyan: #0047ab;
+}
+
+/* ---------------------------------------------------------------- *
+ * DARK MODE
+ * Background: #080808 · Cards: #121212 · Text: #FFFFFF
+ * Accents: Gold #F5B041 and Cyber Cyan #00FFFF
+ * ---------------------------------------------------------------- */
+.dark {
   --background: #080808;
   --foreground: #ffffff;
   --card: #121212;
@@ -88,47 +135,33 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #00ffff;
-}
 
-.dark {
-  /* Same as :root — this app is dark-only by design. */
-  --background: #080808;
-  --foreground: #ffffff;
-  --card: #121212;
-  --card-foreground: #ffffff;
-  --popover: #121212;
-  --popover-foreground: #ffffff;
-  --primary: #f5b041;
-  --primary-foreground: #080808;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ffffff;
-  --muted: #1a1a1a;
-  --muted-foreground: #a3a3a3;
-  --accent: #00ffff;
-  --accent-foreground: #080808;
-  --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: #00ffff;
+  /* Brand */
+  --brand-gold: #f5b041;
+  --brand-cyan: #00ffff;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  html,
-  body {
-    background-color: #080808;
-    color: #ffffff;
+  html {
+    color-scheme: light dark;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-inter), system-ui, sans-serif;
     line-height: 1.8;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
   ::selection {
-    background: rgba(245, 176, 65, 0.35);
-    color: #ffffff;
+    background: color-mix(in srgb, var(--brand-gold) 35%, transparent);
+    color: var(--foreground);
   }
 }
 
@@ -138,13 +171,18 @@
   letter-spacing: 0.05em;
 }
 
-/* ---------- Glass-morphism card ---------- */
+/* ---------- Glass-morphism card (theme-aware) ---------- */
 .glass-card {
   background: rgba(18, 18, 18, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
+}
+:root .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.15);
 }
 
 .glass-nav {
@@ -153,11 +191,16 @@
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
+:root .glass-nav {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.12);
+}
 
 /* ---------- Custom scrollbar (long lists / carousel) ---------- */
 .bs-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(245, 176, 65, 0.5) transparent;
+  scrollbar-color: color-mix(in srgb, var(--brand-gold) 50%, transparent) transparent;
 }
 .bs-scroll::-webkit-scrollbar {
   height: 8px;
@@ -167,11 +210,19 @@
   background: transparent;
 }
 .bs-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(245, 176, 65, 0.45), rgba(0, 255, 255, 0.45));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--brand-gold) 45%, transparent),
+    color-mix(in srgb, var(--brand-cyan) 45%, transparent)
+  );
   border-radius: 999px;
 }
 .bs-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(245, 176, 65, 0.7), rgba(0, 255, 255, 0.7));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--brand-gold) 75%, transparent),
+    color-mix(in srgb, var(--brand-cyan) 75%, transparent)
+  );
 }
 
 /* ---------- Snap carousel ---------- */
@@ -182,15 +233,15 @@
   scroll-snap-align: center;
 }
 
-/* ---------- Brand gradients & glows ---------- */
+/* ---------- Brand gradients & glows (theme-aware) ---------- */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #f5b041 0%, #ffd98a 50%, #f5b041 100%);
+  background: linear-gradient(135deg, var(--brand-gold) 0%, color-mix(in srgb, var(--brand-gold) 60%, #ffffff) 50%, var(--brand-gold) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 .text-gradient-cyan {
-  background: linear-gradient(135deg, #00ffff 0%, #67e8f9 50%, #00ffff 100%);
+  background: linear-gradient(135deg, var(--brand-cyan) 0%, color-mix(in srgb, var(--brand-cyan) 60%, #ffffff) 50%, var(--brand-cyan) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -198,37 +249,40 @@
 
 .glow-gold {
   box-shadow:
-    0 0 0 1px rgba(245, 176, 65, 0.6),
-    0 0 24px rgba(245, 176, 65, 0.35),
-    0 0 60px rgba(245, 176, 65, 0.18);
+    0 0 0 1px color-mix(in srgb, var(--brand-gold) 60%, transparent),
+    0 0 24px color-mix(in srgb, var(--brand-gold) 35%, transparent),
+    0 0 60px color-mix(in srgb, var(--brand-gold) 18%, transparent);
 }
 .glow-cyan {
   box-shadow:
-    0 0 0 1px rgba(0, 255, 255, 0.55),
-    0 0 22px rgba(0, 255, 255, 0.3),
-    0 0 50px rgba(0, 255, 255, 0.15);
+    0 0 0 1px color-mix(in srgb, var(--brand-cyan) 55%, transparent),
+    0 0 22px color-mix(in srgb, var(--brand-cyan) 30%, transparent),
+    0 0 50px color-mix(in srgb, var(--brand-cyan) 15%, transparent);
 }
 
 /* ---------- Shimmer (animated gradient button) ---------- */
 .shimmer-bg {
   background: linear-gradient(
     100deg,
-    #f5b041 0%,
-    #f5b041 35%,
-    #fff3cf 50%,
-    #f5b041 65%,
-    #f5b041 100%
+    var(--brand-gold) 0%,
+    var(--brand-gold) 35%,
+    color-mix(in srgb, var(--brand-gold) 50%, #ffffff) 50%,
+    var(--brand-gold) 65%,
+    var(--brand-gold) 100%
   );
   background-size: 220% 100%;
   animation: shimmer 3.5s linear infinite;
+  color: #080808;
+}
+.dark .shimmer-bg {
+  color: #080808;
+}
+:root .shimmer-bg {
+  color: #ffffff;
 }
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ---------- Floating orbs (hero bg) ---------- */
@@ -273,7 +327,7 @@
   bottom: -6px;
   height: 2px;
   width: 0;
-  background: linear-gradient(90deg, #00ffff, #f5b041);
+  background: linear-gradient(90deg, var(--brand-cyan), var(--brand-gold));
   transition: width 0.32s ease;
 }
 .nav-underline:hover::after,
@@ -281,6 +335,31 @@
   width: 100%;
 }
 
-/* ---------- Carousel scroll snap helpers ---------- */
+/* ---------- Marquee testimonials ---------- */
+.marquee-track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+}
+@keyframes marquee-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-x 40s linear infinite;
+}
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* ---------- Helpers ---------- */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---------- Theme-aware tile text ---------- */
+.tile-text {
+  color: #ffffff;
+}
+:root .tile-text {
+  color: #1a1a1a;
+}

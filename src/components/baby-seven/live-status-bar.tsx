@@ -46,7 +46,7 @@ export function LiveStatusBar() {
               <BookOpen className="h-4 w-4 text-gold" />
             </span>
             <div className="text-left">
-              <p className="font-display text-sm font-semibold tracking-wide text-white">
+              <p className="font-display text-sm font-semibold tracking-wide text-foreground">
                 📖 Blood Disaster is ranking #1 on Google.
               </p>
               <p className="text-xs text-stone">Live · refreshing from Neon DB</p>
@@ -99,7 +99,7 @@ function Counter({
           key={value ?? "na"}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="font-display text-base font-bold text-white"
+          className="font-display text-base font-bold text-foreground"
         >
           {value === null ? "—" : value}
         </motion.span>

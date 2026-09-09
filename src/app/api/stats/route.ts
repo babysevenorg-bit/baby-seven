@@ -3,27 +3,35 @@ import { db } from "@/lib/db";
 
 /**
  * GET /api/stats
- * Returns aggregate counts powering the homepage "Live Status Bar"
- * and "Proof" badge.
+ * Returns aggregate counts powering the homepage "Live Status Bar",
+ * the hero "Live Collaborator Counter", and the "Proof" badge.
  *
  *   {
  *     collaborations: number,       // total collaboration requests received
- *     featuredProjects: number,   // projects flagged isFeatured
+ *     featuredProjects: number,    // projects flagged isFeatured
  *     totalProjects: number,
  *     testimonials: number,
+ *     reelEditors: number,         // reel-editor applicants
  *     pageViews: Record<route, count>
  *   }
  */
 export async function GET() {
   try {
-    const [collaborations, featuredProjects, totalProjects, testimonials, pageViews] =
-      await Promise.all([
-        db.collaboration.count(),
-        db.project.count({ where: { isFeatured: true } }),
-        db.project.count(),
-        db.testimonial.count(),
-        db.pageView.findMany(),
-      ]);
+    const [
+      collaborations,
+      featuredProjects,
+      totalProjects,
+      testimonials,
+      reelEditors,
+      pageViews,
+    ] = await Promise.all([
+      db.collaboration.count(),
+      db.project.count({ where: { isFeatured: true } }),
+      db.project.count(),
+      db.testimonial.count(),
+      db.reelEditor.count(),
+      db.pageView.findMany(),
+    ]);
 
     const viewsByRoute: Record<string, number> = {};
     for (const pv of pageViews) {
@@ -35,6 +43,7 @@ export async function GET() {
       featuredProjects,
       totalProjects,
       testimonials,
+      reelEditors,
       pageViews: viewsByRoute,
     });
   } catch (e) {

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useNav } from "@/lib/nav";
 import { ArrowDown, Sparkles, Trophy } from "lucide-react";
+import { GoogleSearchBar } from "./google-search-bar";
+import { LiveCollaboratorCounter } from "./live-collaborator-counter";
 
 const TAGLINES = ["Novelist", "Director", "Story Architect", "Reels Editor", "Scriptwriter"];
 
@@ -52,7 +54,7 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-void"
+      className="relative min-h-screen w-full overflow-hidden bg-background"
     >
       {/* Animated gradient orbs (parallax) */}
       <motion.div
@@ -102,7 +104,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-[3rem] font-black leading-[0.95] tracking-tight text-white sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem]"
+          className="font-display text-[3rem] font-black leading-[0.95] tracking-tight text-foreground sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem]"
         >
           Baby <span className="text-gradient-gold">Seven</span>
         </motion.h1>
@@ -115,7 +117,7 @@ export function Hero() {
           className="mt-6 max-w-2xl text-base text-ash sm:text-lg md:text-xl"
         >
           Architect of Worlds. Creator of{" "}
-          <span className="font-medium text-white">
+          <span className="font-medium text-foreground">
             &ldquo;Blood Disaster&rdquo;
           </span>
           .
@@ -130,18 +132,24 @@ export function Hero() {
         >
           <button
             onClick={() => setView("portfolio")}
-            className="group relative overflow-hidden rounded-full bg-gold px-8 py-3.5 font-display text-sm font-bold tracking-widest text-void transition-transform hover:scale-[1.03]"
+            className="group relative overflow-hidden rounded-full bg-gold px-8 py-3.5 font-display text-sm font-bold tracking-widest text-black transition-transform hover:scale-[1.03]"
           >
             <span className="relative z-10">EXPLORE WORK</span>
             <span className="absolute inset-0 -z-0 shimmer-bg opacity-80" />
           </button>
           <button
             onClick={() => setView("collaborate")}
-            className="rounded-full border border-white/15 bg-white/5 px-8 py-3.5 font-display text-sm font-bold tracking-widest text-white backdrop-blur-sm transition-all hover:border-cyan hover:text-cyan hover:glow-cyan"
+            className="rounded-full border border-border bg-card/50 px-8 py-3.5 font-display text-sm font-bold tracking-widest text-foreground backdrop-blur-sm transition-all hover:border-cyan hover:text-cyan hover:glow-cyan"
           >
             START A PROJECT
           </button>
         </motion.div>
+
+        {/* Automated Google Search Bar (SEO weapon) */}
+        <GoogleSearchBar />
+
+        {/* Live Collaborator Counter */}
+        <LiveCollaboratorCounter />
 
         {/* Proof Badge */}
         <motion.div
@@ -152,9 +160,9 @@ export function Hero() {
         >
           <div className="relative">
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-gold/40 via-cyan/40 to-gold/40 opacity-60 blur-xl" />
-            <div className="relative flex items-center gap-2 rounded-full border border-gold/40 bg-void/80 px-5 py-2.5 backdrop-blur-md">
+            <div className="relative flex items-center gap-2 rounded-full border border-gold/40 bg-background/80 px-5 py-2.5 backdrop-blur-md">
               <Trophy className="h-4 w-4 text-gold" />
-              <span className="font-display text-xs font-semibold tracking-wider text-white sm:text-sm">
+              <span className="font-display text-xs font-semibold tracking-wider text-foreground sm:text-sm">
                 #1 Ranked Novel — <span className="text-gradient-gold">Blood Disaster</span>
               </span>
               <Sparkles className="h-3.5 w-3.5 text-cyan" />

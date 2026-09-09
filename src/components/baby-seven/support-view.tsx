@@ -44,7 +44,7 @@ export function SupportView() {
 // ---------------------------------------------------------------------------
 function LoadingScreen() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-void px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       {/* Animated film reel */}
       <motion.div
         animate={{ rotate: 360 }}
@@ -114,7 +114,7 @@ function SupportDashboard() {
           className="mb-10 text-center"
         >
           <p className="font-display text-xs tracking-[0.3em] text-cyan">SUPPORT</p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+          <h2 className="mt-2 font-display text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
             Back the Story
           </h2>
           <p className="mt-3 max-w-2xl mx-auto text-sm text-ash sm:text-base">
@@ -139,7 +139,7 @@ function SupportDashboard() {
           </div>
 
           {/* Security footer */}
-          <div className="mt-8 flex flex-col items-center gap-2 border-t border-white/10 pt-6 text-center">
+          <div className="mt-8 flex flex-col items-center gap-2 border-t border-border pt-6 text-center">
             <div className="flex items-center gap-2 text-cyan">
               <Lock className="h-3.5 w-3.5" />
               <ShieldCheck className="h-3.5 w-3.5" />
@@ -185,11 +185,11 @@ function BinanceTile() {
       label="BINANCE"
       title="Binance Pay ID"
     >
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-void/40 px-4 py-3">
-        <code className="font-mono text-base tracking-wider text-white sm:text-lg">{id}</code>
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-card/40 px-4 py-3">
+        <code className="font-mono text-base tracking-wider text-foreground sm:text-lg">{id}</code>
         <button
           onClick={onCopy}
-          className="flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 font-display text-[10px] font-bold tracking-widest text-amber-300 transition-all hover:bg-amber-400/20"
+          className="flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 font-display text-[10px] font-bold tracking-widest text-amber-600 dark:text-amber-300 transition-all hover:bg-amber-400/20"
         >
           {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           {copied ? "COPIED" : "COPY"}
@@ -208,15 +208,15 @@ function PaypalTile() {
       label="PAYPAL"
       title="PayPal.me"
     >
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-void/40 px-4 py-3">
-        <span className="font-mono text-base text-white sm:text-lg">
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-card/40 px-4 py-3">
+        <span className="font-mono text-base text-foreground sm:text-lg">
           {PAYMENT.paypalHandle}
         </span>
         <a
           href={PAYMENT.paypalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 font-display text-[10px] font-bold tracking-widest text-sky-300 transition-all hover:bg-sky-500/20"
+          className="flex items-center gap-1.5 rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 font-display text-[10px] font-bold tracking-widest text-sky-600 dark:text-sky-300 transition-all hover:bg-sky-500/20"
         >
           PAY NOW
           <ExternalLink className="h-3 w-3" />
@@ -247,7 +247,7 @@ function MiniPayTile() {
             fgColor="#080808"
           />
         </div>
-        <code className="font-mono text-xs text-emerald-300">{short}</code>
+        <code className="font-mono text-xs text-emerald-600 dark:text-emerald-300">{short}</code>
         <p className="text-[11px] text-stone">Open MiniPay → scan to send on Celo</p>
       </div>
     </PaymentTile>
@@ -280,12 +280,12 @@ function UsdtTile() {
       title="Tether (BSC)"
     >
       <div className="mt-3 space-y-2">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-void/40 px-4 py-3">
-          <code className="truncate font-mono text-xs text-white sm:text-sm">{addr}</code>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card/40 px-4 py-3">
+          <code className="truncate font-mono text-xs text-foreground sm:text-sm">{addr}</code>
         </div>
         <button
           onClick={onCopy}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-3 py-3 font-display text-xs font-bold tracking-widest text-teal-200 transition-all hover:bg-teal-500/20"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-3 py-3 font-display text-xs font-bold tracking-widest text-teal-700 dark:text-teal-200 transition-all hover:bg-teal-500/20"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? "ADDRESS COPIED" : "COPY ADDRESS"}
@@ -318,7 +318,7 @@ function PaymentTile({
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "relative overflow-hidden rounded-2xl border bg-card-bg p-5 sm:p-6",
+        "relative overflow-hidden rounded-2xl border bg-card p-5 sm:p-6 shadow-sm",
         border,
       )}
       style={{ backgroundImage: gradient }}
@@ -326,12 +326,12 @@ function PaymentTile({
       <div className="relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-void/40">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background/40">
               {icon}
             </div>
             <div>
               <p className="font-display text-[10px] tracking-widest text-ash">{label}</p>
-              <p className="font-display text-sm font-bold text-white">{title}</p>
+              <p className="font-display text-sm font-bold text-foreground">{title}</p>
             </div>
           </div>
         </div>

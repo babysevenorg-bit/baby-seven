@@ -63,7 +63,7 @@ export function FeaturedCarousel() {
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="font-display text-xs tracking-[0.3em] text-cyan">FEATURED</p>
-            <h2 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
+            <h2 className="mt-2 font-display text-2xl font-bold text-foreground sm:text-3xl">
               Signature Work
             </h2>
           </div>
@@ -72,14 +72,14 @@ export function FeaturedCarousel() {
             <button
               onClick={() => scrollBy(-1)}
               aria-label="Previous"
-              className="rounded-full border border-white/10 bg-white/5 p-2.5 text-ash transition-all hover:border-cyan hover:text-cyan"
+              className="rounded-full border border-border bg-card/50 p-2.5 text-ash transition-all hover:border-cyan hover:text-cyan"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => scrollBy(1)}
               aria-label="Next"
-              className="rounded-full border border-white/10 bg-white/5 p-2.5 text-ash transition-all hover:border-cyan hover:text-cyan"
+              className="rounded-full border border-border bg-card/50 p-2.5 text-ash transition-all hover:border-cyan hover:text-cyan"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -118,8 +118,8 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
         className={`group relative overflow-hidden rounded-2xl border ${
           isRank1
             ? "border-gold/60 glow-gold"
-            : "border-white/10 hover:border-cyan/50 hover:glow-cyan"
-        } bg-card-bg`}
+            : "border-border hover:border-cyan/50 hover:glow-cyan"
+        } bg-card`}
       >
         {/* Cover */}
         <div className="relative aspect-[16/10] overflow-hidden">
@@ -129,19 +129,19 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             loading={index < 2 ? "eager" : "lazy"}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-void via-void/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
           {/* Rank #1 ribbon */}
           {isRank1 && (
             <div className="absolute left-0 top-4">
-              <div className="bg-gold px-3 py-1 text-[10px] font-bold tracking-wider text-void shadow-lg">
+              <div className="bg-gold px-3 py-1 text-[10px] font-bold tracking-wider text-void shadow-lg dark:text-void">
                 #1 SEARCH RESULT
               </div>
             </div>
           )}
 
           {/* Category chip */}
-          <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-void/60 px-3 py-1 font-display text-[10px] tracking-widest text-white backdrop-blur-sm">
+          <div className="absolute right-3 top-3 rounded-full border border-border bg-background/60 px-3 py-1 font-display text-[10px] tracking-widest text-foreground backdrop-blur-sm">
             {categoryLabel(project.category).toUpperCase()}
           </div>
 
@@ -157,7 +157,7 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
         {/* Body */}
         <div className="p-5">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="font-display text-lg font-bold text-white">{project.title}</h3>
+            <h3 className="font-display text-lg font-bold text-foreground">{project.title}</h3>
             {isRank1 && (
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (

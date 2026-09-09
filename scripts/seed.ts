@@ -137,10 +137,59 @@ async function main() {
     await db.pageView.create({ data: { route, count: Math.floor(Math.random() * 800) + 200 } });
   }
 
+  // --- Reel Editors (v2.0 talent pool) ------------------------------------
+  const editors = [
+    {
+      fullName: "Theo Marchetti",
+      email: "theo@marchetti.studio",
+      portfolioLink: "https://instagram.com/theo.cuts",
+      editingStyle: "Cinematic",
+      sampleReelUrl: "https://instagram.com/reel/Cxyz123",
+      status: "Shortlisted",
+    },
+    {
+      fullName: "Priya Nair",
+      email: "priya@nairframes.com",
+      portfolioLink: "https://youtube.com/@priyacuts",
+      editingStyle: "Fast-Paced",
+      sampleReelUrl: "https://youtube.com/shorts/abcd456",
+      status: "Pending",
+    },
+    {
+      fullName: "Jordan Blake",
+      email: "jordan@blakefilm.co",
+      portfolioLink: "https://vimeo.com/jordanblake",
+      editingStyle: "Story-driven",
+      sampleReelUrl: "https://vimeo.com/789012",
+      status: "Hired",
+    },
+    {
+      fullName: "Sasha Okonkwo",
+      email: "sasha@viralframe.io",
+      portfolioLink: "https://tiktok.com/@sashaframes",
+      editingStyle: "Viral/Hook",
+      sampleReelUrl: "https://tiktok.com/@sashaframes/video/712345",
+      status: "Pending",
+    },
+    {
+      fullName: "Lena Park",
+      email: "lena@parkreels.studio",
+      portfolioLink: "https://instagram.com/lena.cuts",
+      editingStyle: "Cinematic",
+      sampleReelUrl: "https://instagram.com/reel/Cabc890",
+      status: "Pending",
+    },
+  ];
+
+  for (const e of editors) {
+    await db.reelEditor.create({ data: e });
+  }
+
   console.log("✅ Seed complete.");
   console.log(`  - Projects: ${await db.project.count()}`);
   console.log(`  - Testimonials: ${await db.testimonial.count()}`);
   console.log(`  - PageViews: ${await db.pageView.count()}`);
+  console.log(`  - Reel Editors: ${await db.reelEditor.count()}`);
 }
 
 main()

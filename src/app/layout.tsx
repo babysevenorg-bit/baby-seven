@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/baby-seven/theme-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,9 +18,9 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "Baby Seven — Novelist. Director. Story Architect. | Blood Disaster",
+  title: "Baby Seven — Novelist, Director & Reels Editor | Blood Disaster",
   description:
-    "Baby Seven — Novelist, Video Director, Reels Editor, and Scriptwriter. Creator of 'Blood Disaster', the #1 ranked novel. Cinematic storytelling across page, screen, and script.",
+    "Creator of the #1 ranked 'Blood Disaster' novel. Hire Baby Seven for professional writing, video directing, reels editing, and scriptwriting.",
   keywords: [
     "Blood Disaster Novel",
     "Baby Seven",
@@ -33,7 +34,11 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Baby Seven" }],
   icons: {
-    icon: "/logo.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
   openGraph: {
     title: "Baby Seven — Novelist. Director. Story Architect.",
@@ -50,18 +55,34 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0047AB" },
+    { media: "(prefers-color-scheme: dark)", color: "#F5B041" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${orbitron.variable} antialiased bg-background text-foreground`}
       >
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

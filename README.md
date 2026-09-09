@@ -1,0 +1,169 @@
+# baby-seven
+
+> The cinematic personal-brand web app for **Baby Seven** — #1 ranking Novelist (*Blood Disaster*), Pro Video Director, Reels Editor, and Scriptwriter.
+
+A Next.js 16 single-page experience with a dark/light theme system, an SEO-driven Google Search bar, a Reel Editors & Makers collaboration hub, and a hidden admin studio for managing the applicant pipeline.
+
+---
+
+## ✨ Features
+
+### Theme system
+- **Dark mode (default):** Deep void `#080808`, cards `#121212`, gold `#F5B041` + cyber cyan `#00FFFF` accents.
+- **Light mode:** `#F4F6F9` background, white cards with soft shadow, deep gold `#B8860B` + cobalt blue `#0047AB` accents.
+- Theme toggle (FaSun / FaMoon) in the header. Persists across reloads via `next-themes`.
+- Browser `theme-color` meta tag switches with the active theme.
+
+### Homepage
+- Cinematic hero with mouse-parallax gradient orbs and a rotating tagline (Novelist → Director → Story Architect → Reels Editor → Scriptwriter).
+- **Automated Google Search Bar** — types a query → opens a branded modal → redirects to `https://www.google.com/search?q=<query>+Baby+Seven+Novel`. Forces real-world Google verification of the #1 ranking.
+- **Live Collaborator Counter** — `🔥 Join 50+ creators already collaborating with Baby Seven.` The `+` count is pulled live from the database (collaborations + reel-editor applicants).
+- Featured-work scroll-snap carousel with *Blood Disaster* pinned at #1 (golden glow + `#1 SEARCH RESULT` ribbon).
+- **Expertise Radar Chart** (chart.js) — Writing 100, Directing 95, Reels Editing 100, Scriptwriting 90, SEO Ranking 100.
+- **Auto-scrolling testimonials marquee** with hover-to-pause and edge fades.
+
+### Portfolio
+- Filter pills: All / Writing / Video Editing / Scriptwriting (cyan underline on the active filter).
+- Masonry 3-column grid (1-col on mobile).
+- *Blood Disaster* is pinned to the top of the Writing filter with a golden glow + rotated `#1 SEARCH RESULT` corner ribbon.
+
+### Collaboration Portal
+- Top-level tab switcher: **General Collab** (3-step tier → pitch → contact wizard) vs **Apply as a Reel Editor**.
+- Reel Editor form (`react-hook-form`): name, email, portfolio link, editing style (Fast-Paced / Cinematic / Story-driven / Viral/Hook), sample reel URL.
+- Public **Talent Pool** directory grid of all applicants.
+- Server-side validation + auto-reply email simulation (console log).
+
+### Support
+- 2-second loading screen (`useEffect` + `setTimeout(2000)`) with a spinning film reel and bouncing dots.
+- Glass-morphism 2×2 grid of peer-to-peer payment tiles: Binance (Copy ID), PayPal (Pay Now link), MiniPay/Celo (live QR code via `next/dynamic` ssr:false), USDT BEP-20 (Copy Address).
+- Security footer with the exact lock/security messages from the spec.
+
+### Hidden admin studio
+- Access via the discreet "Studio Access" link in the footer or the URL hash `#admin`.
+- PIN-gated (`babyseven` for demo — replace with NextAuth in production).
+- Two tabs: **Reel Editors** and **Collaborations**.
+- Pipeline actions: advance an editor through `Pending → Shortlisted → Hired`, or delete either record.
+
+### UX niceties
+- Floating "Support" FAB (pulses every 3s).
+- Scroll-to-top button (appears after 300px scroll).
+- Sticky footer (sticks to viewport bottom on short pages, pushes down naturally on long pages).
+- Framer Motion page transitions + staggered card animations throughout.
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Choice |
+|---|---|
+| Framework | **Next.js 16** (App Router) + TypeScript |
+| Styling | **Tailwind CSS 4** + shadcn/ui + custom theme tokens |
+| Animation | **Framer Motion** |
+| Charts | **chart.js** + **react-chartjs-2** |
+| Forms | **react-hook-form** |
+| Theme | **next-themes** |
+| Database | **Prisma ORM** + SQLite (portable to Neon Postgres by changing the datasource in `prisma/schema.prisma`) |
+| QR codes | **qrcode.react** (dynamic import, ssr:false) |
+| Icons | **lucide-react** + **react-icons** (Fa, Si) |
+
+> The original v2.0 spec asked for **Next.js 14 + Neon + Drizzle**. This build targets the local environment which is locked to **Next.js 16 + Prisma + SQLite**. The schema in `prisma/schema.prisma` is portable: switch the `datasource` block to `postgresql` + your Neon URL and run `bun run db:push` to deploy on Neon.
+
+---
+
+## 🚀 Getting started
+
+```bash
+# 1. Install deps
+bun install
+
+# 2. Set up the database
+bun run db:push        # sync the Prisma schema
+bun run scripts/seed.ts  # seed 8 projects, 4 testimonials, 5 reel editors
+
+# 3. Start the dev server
+bun run dev
+# → http://localhost:3000
+```
+
+### Environment
+Create a `.env` file in the project root (it's already gitignored):
+
+```bash
+# SQLite (current — local file)
+DATABASE_URL="file:/home/z/my-project/db/custom.db"
+
+# OR Neon Postgres (production) — swap to this when deploying to Vercel
+# DATABASE_URL="postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/babyseven?sslmode=require"
+```
+
+---
+
+## 📂 Project structure
+
+```
+prisma/
+  schema.prisma                  # Collaboration, ReelEditor, Project, Testimonial, PageView
+scripts/
+  seed.ts                        # Cinematic starter content
+  reset-db.ts                    # Wipe all tables (for idempotent re-seeds)
+src/
+  app/
+    api/
+      collaborations/             # GET list, [id] DELETE
+      editors/                    # GET list, POST apply, [id] PATCH status + DELETE
+      projects/                   # GET (filter by category, featured, pin #1 first)
+      stats/                      # Aggregate counts for the homepage
+      testimonials/               # GET all
+    layout.tsx                    # Orbitron + Inter + ThemeProvider + SEO meta + theme-color
+    page.tsx                      # SPA shell + Framer Motion page transitions
+    globals.css                   # Cinematic dark/light theme tokens
+  components/baby-seven/         # All custom Baby Seven UI components
+  lib/
+    db.ts                         # Prisma client
+    nav.ts                        # Zustand SPA view store (incl. hidden admin)
+    utils.ts                      # cn(), copyToClipboard, truncateAddress, formatBudget, categoryLabel
+```
+
+---
+
+## 🔌 API
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/projects?category=Writing&featured=true` | List projects; pin Blood Disaster first |
+| `POST` | `/api/collaborate` | Submit a general collaboration request |
+| `GET` | `/api/collaborations` | (admin) list all collab requests |
+| `DELETE` | `/api/collaborations/[id]` | (admin) remove a collab request |
+| `GET` | `/api/editors?status=Pending` | List reel-editor applicants |
+| `POST` | `/api/editors` | Submit a reel-editor application |
+| `PATCH` | `/api/editors/[id]` | (admin) update editor status (`Pending`/`Shortlisted`/`Hired`) |
+| `DELETE` | `/api/editors/[id]` | (admin) remove an editor |
+| `GET` | `/api/stats` | Aggregate counts: collaborations, reelEditors, projects, featured, testimonials, pageViews |
+| `GET` | `/api/testimonials` | List all testimonials |
+
+---
+
+## 🌐 Deploying to Vercel
+
+1. Push this repo to GitHub.
+2. Import it in Vercel.
+3. Set the `DATABASE_URL` env var (Neon connection string).
+4. Update `prisma/schema.prisma`'s `datasource` to `provider = "postgresql"`.
+5. Run `bun run db:push` once against the Neon database (or use Vercel's build command).
+6. Deploy.
+
+A minimal `vercel.json` is included in the repo for the build command.
+
+---
+
+## 🔐 Security notes
+
+- This repo **never** contains API keys, tokens, or `DATABASE_URL` — they live in `.env` which is gitignored.
+- The admin PIN (`babyseven`) is for demo only. Replace the `PinGate` with **NextAuth.js** before going to production.
+- The Binance/PayPal/USDT addresses shown on the Support page are placeholders for the demo — replace `PAYMENT` in `src/components/baby-seven/support-view.tsx` with your real addresses.
+
+---
+
+## 📝 License
+
+© Baby Seven Studio. All rights reserved.

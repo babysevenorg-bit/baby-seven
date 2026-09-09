@@ -61,10 +61,10 @@ export function HomeView() {
                 whileHover={{ y: -6 }}
                 className="group glass-card flex flex-col gap-3 p-6 text-left transition-all hover:border-cyan/40"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/5">
                   {card.icon}
                 </div>
-                <h3 className="font-display text-xl font-bold text-white">{card.title}</h3>
+                <h3 className="font-display text-xl font-bold text-foreground">{card.title}</h3>
                 <p className="text-sm text-ash">{card.desc}</p>
                 <span className="mt-2 inline-flex items-center gap-1.5 font-display text-xs tracking-widest text-cyan transition-transform group-hover:translate-x-1">
                   {card.cta.toUpperCase()}
@@ -94,7 +94,7 @@ export function HomeView() {
             <div className="pointer-events-none absolute -bottom-20 right-10 h-60 w-60 rounded-full bg-cyan/20 blur-[100px]" />
             <div className="relative">
               <p className="font-display text-xs tracking-[0.3em] text-cyan">READY?</p>
-              <h2 className="mx-auto mt-3 max-w-2xl font-display text-2xl font-bold text-white sm:text-3xl md:text-4xl">
+              <h2 className="mx-auto mt-3 max-w-2xl font-display text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
                 Let&apos;s build the next world together.
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm text-ash">
@@ -114,7 +114,7 @@ export function HomeView() {
                 </button>
                 <button
                   onClick={() => setView("support")}
-                  className="rounded-full border border-white/15 bg-white/5 px-8 py-3.5 font-display text-sm font-bold tracking-widest text-white transition-all hover:border-cyan hover:text-cyan hover:glow-cyan"
+                  className="rounded-full border border-border bg-card/40 px-8 py-3.5 font-display text-sm font-bold tracking-widest text-foreground transition-all hover:border-cyan hover:text-cyan hover:glow-cyan"
                 >
                   SUPPORT THE WORK
                 </button>

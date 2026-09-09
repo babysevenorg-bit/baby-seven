@@ -1,5 +1,5 @@
-// Prisma schema for Baby Seven cinematic personal brand app.
-// Uses SQLite (per environment constraint). Adapts the original Neon/Drizzle spec.
+// Prisma schema for Baby Seven cinematic personal brand app (v2.0).
+// Uses SQLite (per environment constraint).
 
 generator client {
   provider = "prisma-client-js"
@@ -22,6 +22,18 @@ model Collaboration {
   createdAt DateTime @default(now())
 }
 
+/// Reel editor applicants (Reel Editors & Makers collaboration hub).
+model ReelEditor {
+  id             String   @id @default(cuid())
+  fullName       String
+  email          String
+  portfolioLink  String
+  editingStyle   String   // 'Fast-Paced' | 'Cinematic' | 'Story-driven' | 'Viral/Hook'
+  sampleReelUrl  String?
+  status         String   @default("Pending") // 'Pending' | 'Shortlisted' | 'Hired'
+  createdAt      DateTime @default(now())
+}
+
 /// Portfolio projects (writing, video, scripts).
 model Project {
   id          String  @id @default(cuid())
@@ -36,10 +48,11 @@ model Project {
 
 /// Client testimonials.
 model Testimonial {
-  id        String @id @default(cuid())
-  clientName String
-  text      String
-  rating    Int    // 1..5
+  id          String @id @default(cuid())
+  clientName  String
+  text        String
+  rating      Int    // 1..5
+  projectType String? // e.g. 'Writing' | 'Video' | 'Script'
 }
 
 /// Per-route popularity counter.
