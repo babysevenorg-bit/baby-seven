@@ -1,5 +1,0 @@
-# Handle client-side routing for the SPA.
-# The Baby Seven app is a single-route SPA (everything renders at `/` with
-# in-app view switching), so any unknown path should fall back to the index
-# and let the client take over.
-/* /index.html 200
