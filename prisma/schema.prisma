@@ -70,3 +70,31 @@ model NotifySubscriber {
   createdAt DateTime @default(now())
   notified  Boolean  @default(false) // set true once the launch email is sent
 }
+
+/// Admin users for the protected Studio admin panel.
+/// Passwords are hashed with bcrypt (12 rounds) — never stored in plaintext.
+/// Created by `scripts/create-admin.ts` (interactive, run on your machine).
+model AdminUser {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  passwordHash    String   // bcrypt hash, never the plaintext password
+  role            String   @default("admin") // 'admin' | 'owner'
+  createdAt       DateTime @default(now())
+  lastLoginAt     DateTime?
+  failedAttempts  Int      @default(0)  // resets to 0 on successful login
+  lockedUntil     DateTime? // set when failedAttempts >= 5; clears after 15min
+}
+
+/// Active admin sessions (server-side session store).
+/// Each login creates a row; each logout deletes it. Sessions also expire
+/// after 24 hours of inactivity (enforced by the verifier).
+model AdminSession {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique // SHA-256 of the cookie token — never store the raw token
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  lastSeenAt DateTime @default(now())
+  userAgent  String?
+  ip         String?
+}

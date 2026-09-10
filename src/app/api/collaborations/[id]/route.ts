@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { verifySession, getSessionTokenFromRequest } from "@/lib/admin-auth";
 
 /**
  * DELETE /api/collaborations/[id]
- * Remove a collaboration request. Used by the admin panel.
+ * Remove a collaboration request. Protected — requires an admin session.
+ * Used by the admin panel.
  */
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const user = await verifySession(getSessionTokenFromRequest(req));
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const existing = await db.collaboration.findUnique({ where: { id } });
     if (!existing) {

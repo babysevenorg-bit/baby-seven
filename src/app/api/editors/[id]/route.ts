@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { verifySession, getSessionTokenFromRequest } from "@/lib/admin-auth";
 
 const VALID_STATUSES = new Set(["Pending", "Shortlisted", "Hired"]);
 
 /**
  * PATCH /api/editors/[id]
- * Update a reel-editor applicant's status. Used by the hidden /admin view.
+ * Update a reel-editor applicant's status. Protected — requires an admin
+ * session cookie.
  *
  * Body: { status: "Pending" | "Shortlisted" | "Hired" }
  */
@@ -14,6 +16,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // --- Auth: every protected route starts with this check ---------------
+    const user = await verifySession(getSessionTokenFromRequest(req));
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const body = (await req.json()) as { status?: string };
     const status = (body.status ?? "").trim();
@@ -50,13 +61,21 @@ export async function PATCH(
 
 /**
  * DELETE /api/editors/[id]
- * Remove a reel-editor application. Used by the hidden /admin view.
+ * Remove a reel-editor application. Protected — requires an admin session.
  */
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const user = await verifySession(getSessionTokenFromRequest(req));
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const existing = await db.reelEditor.findUnique({ where: { id } });
     if (!existing) {
