@@ -1,7 +1,7 @@
 "use client";
 
 import { useNav, NAV_ITEMS } from "@/lib/nav";
-import { Heart, Lock } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export function Footer() {
   const setView = useNav((s) => s.setView);
@@ -37,19 +37,10 @@ export function Footer() {
                 {item.label}
               </button>
             ))}
-            {/* Hidden Studio Access link → admin view */}
-            <button
-              onClick={() => {
-                setView("admin");
-                if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="mt-2 inline-flex w-fit items-center gap-1.5 text-left text-[11px] text-stone transition-colors hover:text-gold"
-              aria-label="Studio Access (admin)"
-              title="Studio Access"
-            >
-              <Lock className="h-3 w-3" />
-              Studio Access
-            </button>
+            {/* Admin access is intentionally NOT shown here. The Studio is
+                reachable only via the URL hash #admin (e.g. visiting
+                https://baby-seven-portfolio.pages.dev/#admin) — that's
+                intentional so regular users never see it. */}
           </div>
 
           {/* Support CTA */}
