@@ -6,6 +6,12 @@
 name = "baby-seven-portfolio"
 compatibility_date = "2026-01-31"
 
+# Prisma's edge-runtime client uses `node:buffer` and `node:async_hooks`.
+# Without nodejs_compat, the Worker throws runtime errors on the first
+# API request. Cloudflare's own deploy log warns about this — we're
+# silencing that warning here by enabling the flag explicitly.
+compatibility_flags = ["nodejs_compat"]
+
 # Required for `npx wrangler pages deploy` to recognize this as a Cloudflare
 # Pages project and know where the built assets live. The `bun run pages:build`
 # script (which runs `@cloudflare/next-on-pages`) produces this directory.
