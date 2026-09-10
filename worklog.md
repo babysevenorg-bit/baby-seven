@@ -257,3 +257,23 @@ Stage Summary:
 - D1 migrations + seed SQL are committed and ready to apply via `wrangler d1 migrations apply baby-seven-db --remote`.
 - The user's path to a successful deploy is now: (1) push to GitHub with a fresh credential, (2) connect repo to Cloudflare Pages, (3) build command = `bun run pages:build`, (4) build output = `.vercel/output/static`, (5) add NODE_VERSION=20 + DATABASE_URL env vars, (6) create the D1 database + apply migrations, (7) deploy.
 - All existing functionality preserved: Maintenance Mode, Notify Me, Admin Studio, theme toggle, Google Search Bar, Reel Editor hub, Portfolio filters — every feature works as before in local dev.
+
+---
+Task ID: deploy-fix-3
+Agent: orchestrator
+Task: Fix Cloudflare deploy (wrong build command) + fix ThemeToggle hydration mismatch.
+
+Work Log:
+- Diagnosed the Cloudflare build log: user's build command was set to `bun run build` (Next.js standalone build) instead of `bun run pages:build` (Cloudflare Pages build). The standalone build produces `.next/standalone/`, not the `.vercel/output/static/` Cloudflare Pages needs. Deploy then fails with "Missing entry-point to Worker script or to assets directory".
+- Diagnosed the hydration error: ThemeToggle computed aria-label from resolvedTheme (undefined during SSR + first client render, resolves after mounted effect). Server rendered aria-label="Switch to dark mode" (because resolvedTheme was undefined → isDark=false → label="Switch to dark mode"), client after mount rendered aria-label="Switch to light mode" (because resolvedTheme="dark" → isDark=true → label="Switch to light mode"). Mismatch error.
+- Fix: gated both the icon AND the aria-label on the mounted flag. Before mount, render placeholder with aria-label="Toggle color theme". After mount, render the theme-specific aria-label + icon. Server-rendered HTML and first client render both use the placeholder branch → they match exactly.
+- Verified end-to-end with Agent Browser: page loads with zero hydration errors, theme toggle works in both directions (dark → light → dark), aria-label updates correctly. Reload in light mode also shows zero hydration errors and the correct aria-label on both desktop + mobile toggles.
+- Committed as 39f52b2 "fix: ThemeToggle hydration mismatch on aria-label", pushed to GitHub.
+- Cloudflare build sanity check: `bun run pages:build` still produces successful output ("Build completed"). Lint: 0 errors / 0 warnings.
+
+Stage Summary:
+- Hydration error is fixed in code (commit 39f52b2 on GitHub).
+- Cloudflare deploy failure is NOT a code problem — it's a dashboard configuration problem. The user's build command is set to `bun run build` (wrong) instead of `bun run pages:build` (correct). Required dashboard settings:
+  - Build command: bun run pages:build
+  - Build output directory: .vercel/output/static
+  - Deploy command: LEAVE EMPTY (Cloudflare auto-deploys)
