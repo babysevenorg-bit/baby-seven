@@ -1,12 +1,13 @@
-// Prisma schema for Baby Seven cinematic personal brand app (v2.0).
-// Uses SQLite (per environment constraint).
+// Prisma schema for Baby Seven cinematic personal brand app.
+// Uses Neon Postgres (serverless, edge-compatible) in production.
+// Locally, the same connection string works through Prisma's standard driver.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
